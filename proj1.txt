@@ -1,9 +1,11 @@
 
-You will develop a simple simulator that simulates a synchronous distributed
-system using multi threading. 
+You will develop a simple simulator that simulates 
+
+"a synchronous distributed system using multi threading."
 
 There are n+1 threads in the system: Each of the n processes will be simulated
 by one thread and there is one master thread. 
+
 
 The master thread will “inform” all threads when one round starts. 
 Thus, each thread simulating one process, before it can begin round x, 
