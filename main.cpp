@@ -1,9 +1,11 @@
-#include <iostream>
+#include<iostream>
 #include<fstream>
-#include <vector>
-#include "master_thread.h"
+#include<vector>
+#include"master_thread.h"
 #include<string>
 #include<sstream>
+#include<pthread.h>
+
 using namespace std;
 
 void openfile(string, ifstream &);
@@ -33,10 +35,21 @@ int main(int argc, char *argv[]){
     }
     
     //process input file : done
-    
-    //launch master thread 
 
-    //wait for master thread to finish 
+    //launch master thread
+    pthread_t master_thread1;
+    int err=pthread_create(&master_thread1,NULL,&master_thread_routine,NULL);
+
+    if (err){
+        cout << "Thread creation failed : " << strerror(err);
+        exit(1);
+    }  
+    else
+        cout << "Thread Created with ID : " << master_thread1 << std::endl;
+    
+
+    //wait for master thread to finish
+    err=pthread_join(master_thread1,NULL);
 
     //close files 
     inputfile.close();
@@ -69,37 +82,37 @@ void processfile(ifstream &inputfile){
     //store child thread info
     getline(inputfile,str);
     istringstream iss(str);
-   
+
+    master.process_threads.resize(master.num_child_threads);
+
+    int k=0;
     while (getline(iss, token, ' '))
     {
-        master.UID.push_back(stoi(token));
+        master.process_threads[k].UID=stoi(token);
+        //cout  << k << master.process_threads[k].UID <<endl;
+        ++k;
     }
-
-    master.neighbor_UIDS.resize(master.num_child_threads);
-   
+    
     for(int i=0; i<master.num_child_threads;i++){
         getline(inputfile,str);
         istringstream is(str);
-        cout << str << endl;
     
         while (getline(is, token, ' '))
         {
             int x = stoi(token);
-            master.neighbor_UIDS[i].push_back(master.UID[x-1]);
+            int sid = master.process_threads[x-1].UID;
+            master.process_threads[i].neighbor_UIDS.push_back(sid);
         }
     }
 
-    for(int i =0; i<master.UID.size(); i++){
-        cout << master.UID[i] <<endl;
-    }
 
-    for(int i =0; i<master.UID.size(); i++){
-        cout << "UID is " << master.UID[i] << ". neighbors are : ";
-        for (int j=0; j<master.neighbor_UIDS[i].size(); j++){
-            cout << master.neighbor_UIDS[i][j] << " ";
-        }
-        cout <<endl;
-    }
+    // for(int i =0; i<master.num_child_threads; i++){
+    //     cout << "UID is " << master.process_threads[i].UID << ". neighbors are : ";
+    //     for (int j=0; j<master.process_threads[i].neighbor_UIDS.size(); j++){
+    //         cout << master.process_threads[i].neighbor_UIDS[j] << " ";
+    //     }
+    //     cout <<endl;
+    // }
 
 
 
