@@ -1,18 +1,21 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
-#include"master_thread.h"
 #include<string>
 #include<sstream>
 #include<pthread.h>
-
+//#include"master_thread.h"
+#include"master_thread.cpp"
 using namespace std;
 
 void openfile(string, ifstream &);
 
 void processfile(ifstream &);
 
+master_info master;
+
 int main(int argc, char *argv[]){
+    
     
     ifstream inputfile;
 
@@ -38,7 +41,8 @@ int main(int argc, char *argv[]){
 
     //launch master thread
     pthread_t master_thread1;
-    int err=pthread_create(&master_thread1,NULL,&master_thread_routine,NULL);
+    
+    int err=pthread_create(&master_thread1,NULL,&master_thread_routine,&master);
 
     if (err){
         cout << "Thread creation failed : " << strerror(err);

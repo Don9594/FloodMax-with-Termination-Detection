@@ -1,7 +1,7 @@
 #ifndef master_thread
 #define master_thread
 #include <vector>
-#include "master_thread.cpp"
+//#include "master_thread.cpp"
 
 
 struct thread_info{
@@ -9,11 +9,10 @@ struct thread_info{
     std::vector<int > neighbor_UIDS;
 };
 
-struct {
+struct master_info{
     int num_child_threads;
     std::vector<struct thread_info> process_threads;
-}master;
-
+};
 
 void* master_thread_routine(void * arg);
 
