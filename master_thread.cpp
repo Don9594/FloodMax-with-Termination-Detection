@@ -4,6 +4,7 @@
 #include"process_thread.cpp"
 #include<pthread.h>
 #include"globals.h"
+#include<condition_variable>
 #ifndef master_thread_route
 #define master_thread_route
 
@@ -11,16 +12,14 @@ using namespace std;
 
 void * master_thread_routine(void * arg)
 {
-    round =0;
-    int totalrounds =10;
-    std::cout << "Thread Function :: Start" << std::endl;
-    // Sleep for 2 seconds
-    sleep(2);
-    std::cout << "Thread Function :: End" << std::endl;
-    //launch child threads 
+    one=false;
+    two=false;
+    round=0;
+    int calculated_dfs_E=3;
+    diam_rounds=calculated_dfs_E;
     struct master_info *ptr = (struct master_info *)arg;
 
-    cout << ptr->process_threads[0].UID <<endl;
+    //cout << ptr->process_threads[0].UID <<endl;
     int numthreads = ptr->num_child_threads;
     pthread_t child_threads[numthreads];
     for(int i=0; i<numthreads;i++){
@@ -30,23 +29,41 @@ void * master_thread_routine(void * arg)
             exit(1);
         }  
         else
-            cout << "Child Thread Created with ID : " <<child_threads[i] << endl;
+            ;//cout << "Child Thread Created with ID : " <<child_threads[i] << endl;
     }
 
     
-    pthread_mutex_init(&round_lock,NULL);
+    pthread_mutex_init(&lock_round_completed,NULL);
+    pthread_mutex_init(&lock_process_completed,NULL);
+   
+    
+   
+    while(round!=diam_rounds){
 
-    pthread_mutex_lock(&round_lock);
-    while(round!=totalrounds){
-    pthread_mutex_unlock(&round_lock);
-    //do things 
+        pthread_mutex_lock(&lock_process_completed);
+        one=true; two=false; 
+        cout <<  "top round " << round <<endl;
+        pthread_mutex_unlock(&lock_process_completed);
 
-    pthread_mutex_lock(&round_lock);
-    round++;
-    pthread_mutex_unlock(&round_lock);
+        while(num_processes_completed_round!=ptr->num_child_threads);
+        
+        
+        pthread_mutex_lock(&lock_round_completed);
+        //cout << round <<endl;
+        num_processes_completed_round=0;
+        round=round+1;
+        cout << "inside round"<<round << endl;
+        one=false; two=true;
+        pthread_mutex_unlock(&lock_round_completed);
+
+        // pthread_mutex_lock(&lock_process_completed);
+        // pthread_cond_broadcast(&cond_process_completed);
+        // pthread_mutex_unlock(&lock_process_completed);
+
+        
     }
-    pthread_mutex_unlock(&round_lock);
 
+    cout<< "master got out of while loop" << endl;
 
     //wait for n threads to finish sending message
 
@@ -54,7 +71,6 @@ void * master_thread_routine(void * arg)
 
     //wait for threads to finish reading
     int err;
-
     for(int i=0; i<numthreads;i++){
         err=pthread_join(child_threads[i],NULL);
     }
