@@ -4,54 +4,50 @@
 #include<pthread.h>
 
 
+
+using namespace std;
+
 void *process_thread_routine(void* arg){
     struct thread_info *ptr = (struct thread_info *)arg;
-    bool tmp = true;
-    while(round!=diam_rounds){
-        while(!one){
+    int max_uid= ptr->UID;
 
-        }
-
-        pthread_mutex_lock(&lock_process_completed);
-        pthread_mutex_unlock(&lock_process_completed);
-
-        //send message 
-
-        //wait for messages to come from all neighbours
-        pthread_mutex_lock(&lock_round_completed);
+    while(1){
+        cout << "child before lock" << endl;
+        pthread_mutex_lock(&lock1);
+        cout << "chiild acquired lock " <<endl;
         num_processes_completed_round++;
-        std::cout << "num_processes_completed_round" << num_processes_completed_round << std::endl;
-        pthread_mutex_unlock(&lock_round_completed);
-        //std::cout << "Round " << round << "UID " << ptr->UID <<std::endl;
-
-        //check for messages 
-        //pthread_mutex_lock(&lock_process_completed);
-        while(!two){
-           // pthread_cond_wait(&cond_process_completed,&lock_process_completed);
+        std::stringstream msg;
+        msg <<"child incremented : " << num_processes_completed_round <<'\n';
+        cout << msg.str();
+        while(1){
+            cout << "child entered while loop " <<endl;
+            pthread_cond_wait(&cv,&lock1);
+            cout <<"broadcast worked;" <<endl;
+            break;
         }
-        pthread_mutex_lock(&lock_round_completed);
-        pthread_mutex_unlock(&lock_round_completed);
-        
-        //pthread_mutex_unlock(&lock_process_completed);  
-            
+        pthread_mutex_unlock(&lock1);
 
-        //std::unique_lock<std::mutex> lck (lock_process_completed);
-        
-        
 
+
+        pthread_mutex_lock(&lock2);
+        if (terminate_variable==false){
+            pthread_mutex_unlock(&lock2);
+            break;
+        }
+        pthread_mutex_unlock(&lock2);
     }
-    // //FLoodMax Algorithm 
-    // int max_id = ptr->UID;
+    std::cout << "thread exiting" <<std::endl;
     return NULL;
 }
 
-/*
-thread 1:
-  
+    //send message to neighbours
 
-thread2:
-    pthread_mutex_lock(&mutex);
-    do something that might make condition true 
-    pthread_cond_signal(&cond);
-    pthread_mutex_unlock(&mutex);
-*/
+
+    //spin wait foe message queue
+
+
+    //process messages //find max, select message type to send
+
+    //if type 0 check for max id 
+
+    //if type 1 it is a return 

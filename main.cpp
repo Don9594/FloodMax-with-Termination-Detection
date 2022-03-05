@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
 
     //launch master thread
     pthread_t master_thread1;
-    
+
     int err=pthread_create(&master_thread1,NULL,&master_thread_routine,&master);
 
     if (err){
