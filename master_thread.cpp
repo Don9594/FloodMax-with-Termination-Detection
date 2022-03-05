@@ -4,11 +4,14 @@
 #include"process_thread.cpp"
 #include<pthread.h>
 #include"globals.h"
+#include"message.h"
+#include<vector>
 #include<condition_variable>
 #ifndef master_thread_route
 #define master_thread_route
 
 using namespace std;
+
 
 
 void * master_thread_routine(void * arg)
@@ -21,6 +24,7 @@ void * master_thread_routine(void * arg)
     pthread_cond_init(&cv,NULL);
     pthread_mutex_init(&lock1,NULL);
     pthread_mutex_init(&lock2,NULL);
+    pthread_mutex_init(&lock_msgmap,NULL);
 
     //cout << ptr->process_threads[0].UID <<endl;
     int numthreads = ptr->num_child_threads;
