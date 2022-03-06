@@ -37,29 +37,30 @@ void * master_thread_routine(void * arg)
             exit(1);
         }  
         else
-            cout << "Child Thread Created with ID : " <<child_threads[i] << endl;
+            ;//cout << "Child Thread Created with ID : " <<child_threads[i] << endl;
     }
 
     
    
     while(round!=diam_rounds){
-        cout << "entered main while loop before lock" <<endl;
+        //cout << "entered main while loop before lock" <<endl;
 
 
         pthread_mutex_lock(&lock1);
         if(num_processes_completed_round==numthreads){
             num_processes_completed_round=0;
+            cout<< "completed round " <<round <<endl;
             round++;
             pthread_cond_broadcast(&cv);
             pthread_mutex_unlock(&lock1);
-            cout<< "sent out broadcast" <<endl;
+            //cout<< "sent out broadcast" <<endl;
      
            
         }
         else{
             std::stringstream msg;
             msg << "main thread gives up lock:"<< num_processes_completed_round <<'\n';
-            cout << msg.str();
+            //cout << msg.str();
             pthread_mutex_unlock(&lock1);
 
         }
