@@ -8,6 +8,8 @@
 
 using namespace std;
 
+
+
 void *process_thread_routine(void* arg){
     struct thread_info *ptr = (struct thread_info *)arg;
     int local_max_uid= ptr->UID;
@@ -45,7 +47,16 @@ void *process_thread_routine(void* arg){
 
 
         //wait 
-        while(messagemap[my_uid].size()!=num_nbrs);
+        while(1){
+            pthread_mutex_lock(&lock_msgmap);
+            if(messagemap[my_uid].size()==num_nbrs){
+                break;
+            }
+            else{
+                pthread_mutex_unlock(&lock_msgmap);
+            }
+        }
+        pthread_mutex_unlock(&lock_msgmap);
 
         //msg: 0 search | 1 reject | 2 accept | 3 done | 4 terminate
         //read msgs
@@ -85,7 +96,7 @@ void *process_thread_routine(void* arg){
                 std::stringstream msg3;
                 msg3 << my_uid <<"with max id " <<local_max_uid <<" got a reject message from " << messagemap[my_uid][i].sender_uid <<" with sender max: "<<messagemap[my_uid][i].max_uid<<"\n ";
                 cout << msg3.str();
-                if(local_max_uid>= messagemap[my_uid][i].max_uid){
+                if(local_max_uid== messagemap[my_uid][i].max_uid){
                     reject_msgs+=1;
                 }
                 int x=messagemap[my_uid][i].sender_uid;
@@ -130,25 +141,26 @@ void *process_thread_routine(void* arg){
 
         //handle i am done case;
         pthread_mutex_lock(&lock_msgmap);
-        if(reject_msgs==num_nbrs){
-            for(int i=0; i<num_nbrs;i++){
-                int x=messagemap[my_uid][i].sender_uid;
-                msg_t_nbrs[x]=3;
+        if(reject_msgs+done_msgs==num_nbrs){
+            if(my_uid==local_max_uid){
+                for(int i=0; i<num_nbrs;i++){
+                    int x=messagemap[my_uid][i].sender_uid;
+                    msg_t_nbrs[x]=4;
+                }
+                std::stringstream msg10;
+                msg10 << my_uid <<" will send terminate msgs \n";
+                cout << msg10.str();
+            }
+            else{
+                for(int i=0; i<num_nbrs;i++){
+                    int x=messagemap[my_uid][i].sender_uid;
+                    msg_t_nbrs[x]=3;
+                }
+                std::stringstream msg;
+                msg << my_uid <<" will send i am done msgs  \n";
+                cout << msg.str();
             }
         }
-        else if(done_msgs==num_nbrs){
-            for(int i=0; i<num_nbrs;i++){
-                int x=messagemap[my_uid][i].sender_uid;
-                msg_t_nbrs[x]=4;
-            }
-        }
-        else ;
-        // else if((done_msgs==num_nbrs-1)&&(reject_msgs==1)){
-        //     for(int i=0; i<num_nbrs;i++){
-        //         int x=messagemap[my_uid][i].sender_uid;
-        //         msg_t_nbrs[x]=3;
-        //     }
-        // }
         pthread_mutex_unlock(&lock_msgmap);
 
         

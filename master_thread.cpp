@@ -58,8 +58,8 @@ void * master_thread_routine(void * arg)
            
         }
         else{
-            std::stringstream msg;
-            msg << "main thread gives up lock:"<< num_processes_completed_round <<'\n';
+            //std::stringstream msg;
+            //msg << "main thread gives up lock:"<< num_processes_completed_round <<'\n';
             //cout << msg.str();
             pthread_mutex_unlock(&lock1);
 
