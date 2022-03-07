@@ -110,14 +110,6 @@ void processfile(ifstream &inputfile){
     }
 
 
-    // for(int i =0; i<master.num_child_threads; i++){
-    //     cout << "UID is " << master.process_threads[i].UID << ". neighbors are : ";
-    //     for (int j=0; j<master.process_threads[i].neighbor_UIDS.size(); j++){
-    //         cout << master.process_threads[i].neighbor_UIDS[j] << " ";
-    //     }
-    //     cout <<endl;
-    // }
-
 
 
 }
