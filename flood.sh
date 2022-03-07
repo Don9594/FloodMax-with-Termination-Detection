@@ -1,1 +1,1 @@
- g++ -Wall -pthread -std=c++11 main.cpp FloodMax
+ g++ -Wall -pthread -std=c++11 -o FloodMax main.cpp 
