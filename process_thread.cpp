@@ -77,7 +77,7 @@ void *process_thread_routine(void* arg){
                     local_max_uid=messagemap[my_uid][i].max_uid;
                     std::stringstream msg2;
                     msg2 << my_uid << " recieved id larger than local max: " << local_max_uid <<endl;
-                    cout << msg2.str();
+                    //cout << msg2.str();
                     int j=0;
                     while(j<children.size()){
                         if(children[j]==parent){
@@ -95,7 +95,7 @@ void *process_thread_routine(void* arg){
             else if(messagemap[my_uid][i].type==1){
                 std::stringstream msg3;
                 msg3 << my_uid <<"with max id " <<local_max_uid <<" got a reject message from " << messagemap[my_uid][i].sender_uid <<" with sender max: "<<messagemap[my_uid][i].max_uid<<"\n ";
-                cout << msg3.str();
+                //cout << msg3.str();
                 if(local_max_uid== messagemap[my_uid][i].max_uid){
                     reject_msgs+=1;
                 }
@@ -105,7 +105,7 @@ void *process_thread_routine(void* arg){
             else if(messagemap[my_uid][i].type==2){
                 std::stringstream msg4;
                 msg4 << my_uid <<"with max id " <<local_max_uid << "got a accept message"<<messagemap[my_uid][i].sender_uid <<" with sender max: "<<messagemap[my_uid][i].max_uid<<"\n ";
-                cout << msg4.str();
+                //cout << msg4.str();
                 //add to children
                 int x=messagemap[my_uid][i].sender_uid;
                 msg_t_nbrs[x]=0;
@@ -116,7 +116,7 @@ void *process_thread_routine(void* arg){
             else if(messagemap[my_uid][i].type==3){
                 std::stringstream msg5;
                 msg5 << my_uid <<"with max id " <<local_max_uid <<"got a done message from "<<messagemap[my_uid][i].sender_uid<<" with sender max: "<<messagemap[my_uid][i].max_uid <<"\n ";
-                cout << msg5.str();
+                //cout << msg5.str();
                 done_msgs+=1;
                 int x=messagemap[my_uid][i].sender_uid;
                 msg_t_nbrs[x]=0;
@@ -127,13 +127,13 @@ void *process_thread_routine(void* arg){
                 //forward it and then terminate
                 std::stringstream msg6;
                 msg6 << my_uid <<"got a terminate message\n ";
-                cout << msg6.str();
+                //cout << msg6.str();
                 terminate=true;
                 break;
                 
             }
             else{
-                cout << "error. type was wrong" <<endl;
+                //cout << "error. type was wrong" <<endl;
             }
         }
         pthread_mutex_unlock(&lock_msgmap);
@@ -155,7 +155,7 @@ void *process_thread_routine(void* arg){
                     }
                     std::stringstream msg10;
                     msg10 << my_uid <<" will send terminate msgs \n";
-                    cout << msg10.str();
+                    //cout << msg10.str();
                 }
             else{
                 for(int i=0; i<num_nbrs;i++){
@@ -164,7 +164,7 @@ void *process_thread_routine(void* arg){
                 }
                 std::stringstream msg;
                 msg << my_uid <<" will send i am done msgs  \n";
-                cout << msg.str();
+                //cout << msg.str();
             }
             }
             pthread_mutex_unlock(&lock_msgmap);
@@ -182,17 +182,17 @@ void *process_thread_routine(void* arg){
      
         
         //code below is just to complete round
-        //cout << "child before lock" << endl;
+        ////cout << "child before lock" << endl;
         pthread_mutex_lock(&lock1);
-        //cout << "chiild acquired lock " <<endl;
+        ////cout << "chiild acquired lock " <<endl;
         num_processes_completed_round++;
         std::stringstream msg1;
         msg1 <<"child incremented : " << num_processes_completed_round <<'\n';
-        cout << msg1.str();
+        //cout << msg1.str();
         while(1){
-            //cout << "child entered while loop " <<endl;
+            ////cout << "child entered while loop " <<endl;
             pthread_cond_wait(&cv,&lock1);
-            //cout <<"broadcast worked;" <<endl;
+            ////cout <<"broadcast worked;" <<endl;
             break;
         }
         pthread_mutex_unlock(&lock1);
@@ -214,14 +214,18 @@ void *process_thread_routine(void* arg){
 
 
         if(terminate){
+
             pthread_mutex_lock(&lock2);
             terminate_variable++;
             finish_threads=finish_threads+1;
             pthread_mutex_unlock(&lock2);
-           break;
+            std::stringstream t_msg;
+            t_msg<<"Process ID: " << my_uid <<" | Parent ID: "<<parent<<" Leader ID: "<<local_max_uid <<'\n';
+            cout << t_msg.str();
+            break;
         }
 
     }
-    std::cout << "thread exiting" <<std::endl;
+    //std::cout << "thread exiting" <<std::endl;
     return NULL;
 }
