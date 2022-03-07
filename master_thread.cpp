@@ -36,7 +36,7 @@ void * master_thread_routine(void * arg)
     for(int i=0; i<numthreads;i++){
         int err=pthread_create(&child_threads[i],NULL,&process_thread_routine,&ptr->process_threads[i]);
         if (err){
-            cout << "Thread creation failed : " << strerror(err);
+            cout << "Thread creation failed : ";
             exit(1);
         }  
         else
