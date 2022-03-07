@@ -14,10 +14,13 @@ using namespace std;
 
 
 
+
+
 void * master_thread_routine(void * arg)
 {
+    finish_threads=0;
     num_processes_completed_round=0;
-    terminate_variable=true;
+    terminate_variable=0;
     int round=0;
     int diam_rounds=3;
     struct master_info *ptr = (struct master_info *)arg;
@@ -40,7 +43,8 @@ void * master_thread_routine(void * arg)
             ;//cout << "Child Thread Created with ID : " <<child_threads[i] << endl;
     }
 
-    
+    diam_rounds=15;
+
    
     while(round!=diam_rounds){
         //cout << "entered main while loop before lock" <<endl;
@@ -64,13 +68,17 @@ void * master_thread_routine(void * arg)
             pthread_mutex_unlock(&lock1);
 
         }
+        pthread_mutex_lock(&lock2);
+        numthreads=numthreads-finish_threads;
+        finish_threads=0;
+        if(terminate_variable==numthreads)break;
+        pthread_mutex_unlock(&lock2);
     }
-
-
-
-    pthread_mutex_lock(&lock2);
-    terminate_variable=false;
     pthread_mutex_unlock(&lock2);
+
+
+
+    
 
     int err;
     for(int i=0; i<numthreads;i++){

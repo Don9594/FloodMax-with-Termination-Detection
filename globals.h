@@ -4,9 +4,9 @@
 #include "pthread.h"
 //#include<mutex>
 
-bool terminate_variable;
+int terminate_variable;
 int num_processes_completed_round;
-
+int finish_threads;
 pthread_mutex_t lock1;
 pthread_mutex_t lock2;
 pthread_cond_t cv;

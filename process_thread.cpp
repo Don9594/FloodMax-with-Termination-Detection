@@ -129,8 +129,7 @@ void *process_thread_routine(void* arg){
                 msg6 << my_uid <<"got a terminate message\n ";
                 cout << msg6.str();
                 terminate=true;
-                int x=messagemap[my_uid][i].sender_uid;
-                msg_t_nbrs[x]=4;
+                break;
                 
             }
             else{
@@ -140,17 +139,24 @@ void *process_thread_routine(void* arg){
         pthread_mutex_unlock(&lock_msgmap);
 
         //handle i am done case;
-        pthread_mutex_lock(&lock_msgmap);
-        if(reject_msgs+done_msgs==num_nbrs){
-            if(my_uid==local_max_uid){
-                for(int i=0; i<num_nbrs;i++){
-                    int x=messagemap[my_uid][i].sender_uid;
-                    msg_t_nbrs[x]=4;
+        if(!terminate){
+
+            pthread_mutex_lock(&lock_msgmap);
+            if(reject_msgs+done_msgs==num_nbrs){
+                if(my_uid==local_max_uid){
+                    pthread_mutex_lock(&lock2);
+                    terminate_variable++;
+                    pthread_mutex_unlock(&lock2);
+                    terminate=true;
+                    for(int i=0; i<num_nbrs;i++){
+                        int x=messagemap[my_uid][i].sender_uid;
+                        msg_t_nbrs[x]=4;
+
+                    }
+                    std::stringstream msg10;
+                    msg10 << my_uid <<" will send terminate msgs \n";
+                    cout << msg10.str();
                 }
-                std::stringstream msg10;
-                msg10 << my_uid <<" will send terminate msgs \n";
-                cout << msg10.str();
-            }
             else{
                 for(int i=0; i<num_nbrs;i++){
                     int x=messagemap[my_uid][i].sender_uid;
@@ -160,8 +166,10 @@ void *process_thread_routine(void* arg){
                 msg << my_uid <<" will send i am done msgs  \n";
                 cout << msg.str();
             }
+            }
+            pthread_mutex_unlock(&lock_msgmap);
         }
-        pthread_mutex_unlock(&lock_msgmap);
+
 
         
 
@@ -172,19 +180,7 @@ void *process_thread_routine(void* arg){
 
 
      
-        pthread_mutex_lock(&lock_msgmap);
-        if(terminate){
-            for(int i=0; i<num_nbrs;i++){
-                //send message type based on what to send
-                int x=messagemap[my_uid][i].sender_uid;
-                msg_t_nbrs[x]=4;
-                msg.type=4;
-                messagemap[ptr->neighbor_UIDS[i]].push_back(msg);
-            }
-        }
-        pthread_mutex_unlock(&lock_msgmap);
-        done_msgs=0;
-        reject_msgs=0;
+        
         //code below is just to complete round
         //cout << "child before lock" << endl;
         pthread_mutex_lock(&lock1);
@@ -192,7 +188,7 @@ void *process_thread_routine(void* arg){
         num_processes_completed_round++;
         std::stringstream msg1;
         msg1 <<"child incremented : " << num_processes_completed_round <<'\n';
-        //cout << msg1.str();
+        cout << msg1.str();
         while(1){
             //cout << "child entered while loop " <<endl;
             pthread_cond_wait(&cv,&lock1);
@@ -201,15 +197,30 @@ void *process_thread_routine(void* arg){
         }
         pthread_mutex_unlock(&lock1);
 
-        
+        pthread_mutex_lock(&lock_msgmap);
+        if(terminate){
+            for(int i=0; i<num_nbrs;i++){
+                //send message type based on what to send
+                int x=messagemap[my_uid][i].sender_uid;
+                msg_t_nbrs[x]=4;
+                msg.type=4;
+                msg.max_uid=local_max_uid;
+                messagemap[ptr->neighbor_UIDS[i]].push_back(msg);
+            }
+        }
+        pthread_mutex_unlock(&lock_msgmap);
+        done_msgs=0;
+        reject_msgs=0;
 
 
         if(terminate){
+            pthread_mutex_lock(&lock2);
+            terminate_variable++;
+            finish_threads=finish_threads+1;
+            pthread_mutex_unlock(&lock2);
            break;
         }
 
-        
-        
     }
     std::cout << "thread exiting" <<std::endl;
     return NULL;
