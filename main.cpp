@@ -45,11 +45,11 @@ int main(int argc, char *argv[]){
     int err=pthread_create(&master_thread1,NULL,&master_thread_routine,&master);
 
     if (err){
-        cout << "Thread creation failed : " << strerror(err);
+        cout << "Thread creation failed : " ;
         exit(1);
     }  
     else
-        cout << "Thread Created with ID : " << master_thread1 << std::endl;
+        //cout << "Thread Created with ID : " << master_thread1 << std::endl;
     
 
     //wait for master thread to finish
