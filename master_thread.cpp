@@ -46,7 +46,7 @@ void * master_thread_routine(void * arg)
     diam_rounds=15;
 
    
-    while(round!=diam_rounds){
+    while(1){
         ////cout << "entered main while loop before lock" <<endl;
 
 
@@ -71,7 +71,7 @@ void * master_thread_routine(void * arg)
         pthread_mutex_lock(&lock2);
         numthreads=numthreads-finish_threads;
         finish_threads=0;
-        if(terminate_variable==numthreads)break;
+        if(numthreads==0)break;
         pthread_mutex_unlock(&lock2);
     }
     pthread_mutex_unlock(&lock2);

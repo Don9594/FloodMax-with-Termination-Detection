@@ -216,7 +216,7 @@ void *process_thread_routine(void* arg){
         if(terminate){
 
             pthread_mutex_lock(&lock2);
-            terminate_variable++;
+            //terminate_variable++;
             finish_threads=finish_threads+1;
             pthread_mutex_unlock(&lock2);
             std::stringstream t_msg;
