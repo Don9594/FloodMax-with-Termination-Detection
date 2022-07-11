@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
     int err=pthread_create(&master_thread1,NULL,&master_thread_routine,&master);
 
     if (err){
-        cout << "Thread creation failed : " ;
+        cout << "Thread creation failedd: " ;
         exit(1);
     }  
     else
